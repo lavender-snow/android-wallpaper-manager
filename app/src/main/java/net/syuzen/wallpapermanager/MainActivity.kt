@@ -1,10 +1,8 @@
 package net.syuzen.wallpapermanager
 
 import android.app.Activity
-import android.app.WallpaperManager
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.pm.PackageManager.*
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
@@ -30,9 +28,8 @@ import net.syuzen.wallpapermanager.utils.getScreenSizePx
 import net.syuzen.wallpapermanager.utils.loadValue
 import net.syuzen.wallpapermanager.utils.makeLetterboxedImage
 import net.syuzen.wallpapermanager.utils.saveValue
+import net.syuzen.wallpapermanager.utils.WallpaperUtil.setCustomWallpaper
 import java.io.File
-import java.io.IOException
-
 
 private const val REQUEST_CROP_PORTRAIT = UCrop.REQUEST_CROP + 1
 private const val REQUEST_CROP_LANDSCAPE = UCrop.REQUEST_CROP + 2
@@ -65,7 +62,7 @@ class MainActivity : AppCompatActivity() {
 
         // 通知権限の確認とリクエスト
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (this.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PERMISSION_GRANTED) {
+            if (this.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                 this.requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 1001)
             }
         }
@@ -105,16 +102,33 @@ class MainActivity : AppCompatActivity() {
         if (wallpaperManagerEnabled) {
             startForegroundService(intent)
             Log.v("MainActivity", "WallpaperManager is enabled, starting service and foreground service")
-            setCustomWallpaper(getCurrentWallpaperType())
+
+            updateWallpaper()
         }
 
         wallpaperManagerEnabledSwitch?.setOnCheckedChangeListener { _, isChecked ->
             saveValue(this, SHARED_PREFS_NAME, "wallpaper_manager_enabled", isChecked)
             if (isChecked) {
                 startForegroundService(intent)
-                setCustomWallpaper(getCurrentWallpaperType())
+                updateWallpaper()
             } else {
                 stopService(intent)
+            }
+        }
+    }
+
+    private fun updateWallpaper() {
+        if (getCurrentWallpaperType() == WallpaperType.PORTRAIT) {
+            val currentPortraitUri = portraitUri
+
+            if (currentPortraitUri != null) {
+                setCustomWallpaper(this, currentPortraitUri)
+            }
+        } else {
+            val currentLandscapeUri = landscapeUri
+
+            if (currentLandscapeUri != null) {
+                setCustomWallpaper(this, currentLandscapeUri)
             }
         }
     }
@@ -188,7 +202,7 @@ class MainActivity : AppCompatActivity() {
 
             // スイッチがONで、かつ現在の向きがポートレートなら壁紙を更新
             if (wallpaperManagerEnabled && resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-                setCustomWallpaper(WallpaperType.PORTRAIT)
+                setCustomWallpaper(this, resultUri)
             }
             Toast.makeText(this, "縦向きの壁紙の設定が完了しました", Toast.LENGTH_SHORT).show()
         } else if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_CROP_LANDSCAPE) {
@@ -200,45 +214,13 @@ class MainActivity : AppCompatActivity() {
 
             // スイッチがONで、かつ現在の向きがランドスケープなら壁紙を更新 (isCurrentOrientationPortrait() の否定で判定)
             if (wallpaperManagerEnabled && resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                setCustomWallpaper(WallpaperType.LANDSCAPE)
+                setCustomWallpaper(this, resultUri)
             }
             Toast.makeText(this, "横向きの壁紙の設定が完了しました", Toast.LENGTH_SHORT).show()
         } else if (resultCode == UCrop.RESULT_ERROR) {
             val err = UCrop.getError(data!!)
             Log.e("onActivityResultError", err.toString())
             Toast.makeText(this, "画像の切り抜きに失敗しました: ${err?.message}", Toast.LENGTH_LONG).show() // エラー内容をToastで表示
-        }
-    }
-
-    private fun setCustomWallpaper(type: WallpaperType) {
-        val wallpaperManager = WallpaperManager.getInstance(applicationContext)
-        try {
-            if (type == WallpaperType.PORTRAIT) {
-                val currentPortraitUri = portraitUri
-                if (currentPortraitUri != null) {
-                    contentResolver.openInputStream(currentPortraitUri)?.use { input ->
-                        wallpaperManager.setStream(
-                            input,
-                            null,
-                            false
-                        )
-                    }
-                }
-            } else if (type == WallpaperType.LANDSCAPE) {
-                val currentLandscapeUri = landscapeUri
-                if (currentLandscapeUri != null) {
-                    contentResolver.openInputStream(currentLandscapeUri)?.use { input ->
-                        wallpaperManager.setStream(
-                            input,
-                            null,
-                            false
-                        )
-                    }
-                }
-            }
-        } catch (e: IOException) {
-            e.printStackTrace()
-            Toast.makeText(this, "Failed to set wallpaper.", Toast.LENGTH_SHORT).show()
         }
     }
 }

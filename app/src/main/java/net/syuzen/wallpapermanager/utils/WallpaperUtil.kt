@@ -1,17 +1,10 @@
 package net.syuzen.wallpapermanager.utils
 
 import android.app.WallpaperManager
-import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import android.widget.Toast
 import java.io.IOException
-import kotlin.printStackTrace
-
-enum class WallpaperType {
-    PORTRAIT,
-    LANDSCAPE
-}
 
 object WallpaperUtil {
     private val wallpaperCache = HashMap<Uri, ByteArray>()
