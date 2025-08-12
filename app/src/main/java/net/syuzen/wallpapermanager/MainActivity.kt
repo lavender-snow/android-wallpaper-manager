@@ -3,6 +3,7 @@ package net.syuzen.wallpapermanager
 import android.app.Activity
 import android.app.WallpaperManager
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -18,24 +19,16 @@ import com.google.android.material.switchmaterial.SwitchMaterial
 import com.yalantis.ucrop.UCrop
 import kotlinx.coroutines.launch
 import net.syuzen.wallpapermanager.service.OrientationService
+import net.syuzen.wallpapermanager.utils.Const.LANDSCAPE_URI_KEY
+import net.syuzen.wallpapermanager.utils.Const.PORTRAIT_URI_KEY
+import net.syuzen.wallpapermanager.utils.Const.SHARED_PREFS_NAME
 import net.syuzen.wallpapermanager.utils.getAspectForUCrop
 import net.syuzen.wallpapermanager.utils.getScreenSizePx
 import net.syuzen.wallpapermanager.utils.loadValue
 import net.syuzen.wallpapermanager.utils.makeLetterboxedImage
 import net.syuzen.wallpapermanager.utils.saveValue
-import net.syuzen.wallpapermanager.utils.Const.SHARED_PREFS_NAME
-import net.syuzen.wallpapermanager.utils.Const.PORTRAIT_URI_KEY
-import net.syuzen.wallpapermanager.utils.Const.LANDSCAPE_URI_KEY
 import java.io.File
 import java.io.IOException
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.IntentFilter
-import android.content.res.Configuration
-import android.hardware.display.DisplayManager
-import android.os.Build
-import androidx.annotation.RequiresApi
-import kotlin.text.compareTo
 
 
 private const val REQUEST_CROP_PORTRAIT = UCrop.REQUEST_CROP + 1
