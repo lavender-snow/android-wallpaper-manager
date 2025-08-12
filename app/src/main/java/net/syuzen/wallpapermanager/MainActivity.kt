@@ -3,8 +3,11 @@ package net.syuzen.wallpapermanager
 import android.app.Activity
 import android.app.WallpaperManager
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.content.pm.PackageManager.*
 import android.content.res.Configuration
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
@@ -60,6 +63,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main) // レイアウトファイルを指定
 
+        // 通知権限の確認とリクエスト
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (this.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PERMISSION_GRANTED) {
+                this.requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 1001)
+            }
+        }
+
         portraitUri = loadValue(this, SHARED_PREFS_NAME, PORTRAIT_URI_KEY, "string")?.toUri()
         landscapeUri = loadValue(this, SHARED_PREFS_NAME, LANDSCAPE_URI_KEY, "string")?.toUri()
 
@@ -92,6 +102,12 @@ class MainActivity : AppCompatActivity() {
 
         val intent = Intent(this, OrientationService::class.java)
 
+        if (wallpaperManagerEnabled) {
+            startForegroundService(intent)
+            Log.v("MainActivity", "WallpaperManager is enabled, starting service and foreground service")
+            setCustomWallpaper(getCurrentWallpaperType())
+        }
+
         wallpaperManagerEnabledSwitch?.setOnCheckedChangeListener { _, isChecked ->
             saveValue(this, SHARED_PREFS_NAME, "wallpaper_manager_enabled", isChecked)
             if (isChecked) {
@@ -100,11 +116,6 @@ class MainActivity : AppCompatActivity() {
             } else {
                 stopService(intent)
             }
-        }
-
-        if (wallpaperManagerEnabled) {
-            startForegroundService(intent)
-            setCustomWallpaper(getCurrentWallpaperType())
         }
     }
 

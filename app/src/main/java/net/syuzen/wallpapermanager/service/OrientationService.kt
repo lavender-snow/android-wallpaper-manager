@@ -44,16 +44,14 @@ class OrientationService : Service() {
         displayManager = getSystemService(DisplayManager::class.java)
         displayManager.registerDisplayListener(listener, null)
         Log.v("OrientationService", "OrientationService started")
-        startForegroundService()
+        initializeForegroundState()
     }
 
-    private fun startForegroundService() {
+    private fun initializeForegroundState() {
         val channelId = "orientation_service"
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(channelId, "Orientation Service", NotificationManager.IMPORTANCE_LOW)
-            val manager = getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(channel)
-        }
+        val channel = NotificationChannel(channelId, "Orientation Service", NotificationManager.IMPORTANCE_LOW)
+        val manager = getSystemService(NotificationManager::class.java)
+        manager.createNotificationChannel(channel)
         val notification = Notification.Builder(this, channelId)
             .setContentTitle("Wallpaper Manager")
             .setContentText("画面の向きを監視中")
