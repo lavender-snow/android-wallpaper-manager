@@ -55,6 +55,14 @@ class MainActivity : AppCompatActivity() {
         var wallpaperManagerEnabled = false
     }
 
+    private fun getCurrentWallpaperType(): WallpaperType {
+        return if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            WallpaperType.PORTRAIT
+        } else {
+            WallpaperType.LANDSCAPE
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main) // レイアウトファイルを指定
@@ -95,13 +103,7 @@ class MainActivity : AppCompatActivity() {
             saveValue(this, SHARED_PREFS_NAME, "wallpaper_manager_enabled", isChecked)
             if (isChecked) {
                 startForegroundService(intent)
-                setCustomWallpaper(
-                    if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-                        WallpaperType.PORTRAIT
-                    } else {
-                        WallpaperType.LANDSCAPE
-                    }
-                )
+                setCustomWallpaper(getCurrentWallpaperType())
             } else {
                 stopService(intent)
             }
@@ -109,6 +111,7 @@ class MainActivity : AppCompatActivity() {
 
         if (wallpaperManagerEnabled) {
             startForegroundService(intent)
+            setCustomWallpaper(getCurrentWallpaperType())
         }
     }
 
