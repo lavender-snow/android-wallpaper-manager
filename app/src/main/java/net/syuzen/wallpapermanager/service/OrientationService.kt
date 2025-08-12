@@ -57,7 +57,7 @@ class OrientationService : Service() {
         val notification = Notification.Builder(this, channelId)
             .setContentTitle("Wallpaper Manager")
             .setContentText("画面の向きを監視中")
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.drawable.ic_kyomu_penguin_silhouette)
             .build()
         startForeground(1, notification)
     }
