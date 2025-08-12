@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">WallpaperManager</string>
+    <string name="set_portrait_wallpaper">Set Portrait Wallpaper</string>
+    <string name="set_landscape_wallpaper">Set Landscape Wallpaper</string>
+    <string name="portrait_wallpaper_image">Portrait Wallpaper Image</string>
+    <string name="landscape_wallpaper_image">Landscape Wallpaper Image</string>
+    <string name="tool_enabled">Tool Enabled</string>
+    <string name="wallpaper_manager_enabled">Wallpaper Manager Enabled</string>
+</resources>
