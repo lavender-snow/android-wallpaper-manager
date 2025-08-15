@@ -20,9 +20,9 @@ class OrientationService : Service() {
 
     public fun isPortrait(): Boolean {
         val display = displayManager.getDisplay(Display.DEFAULT_DISPLAY) ?: return true
-        val rotation = display.rotation
-
-        return rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180
+        val metrics = android.util.DisplayMetrics()
+        display.getRealMetrics(metrics)
+        return metrics.heightPixels >= metrics.widthPixels
     }
 
     private val listener = object : DisplayManager.DisplayListener {
