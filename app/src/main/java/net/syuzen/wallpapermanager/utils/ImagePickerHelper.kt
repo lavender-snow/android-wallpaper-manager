@@ -68,6 +68,7 @@ class ImagePickerHelper(
         }
     }
 
+    @Suppress("unused")
     fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == Activity.RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
             val resultUri = UCrop.getOutput(data!!) ?: return
